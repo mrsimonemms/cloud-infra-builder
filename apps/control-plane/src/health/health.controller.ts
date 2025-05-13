@@ -15,7 +15,11 @@
  */
 import { Controller, Get, Inject, VERSION_NEUTRAL } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
+import {
+  HealthCheck,
+  HealthCheckService,
+  TypeOrmHealthIndicator,
+} from '@nestjs/terminus';
 
 import { TemporalService } from '../temporal/temporal.service';
 
@@ -25,6 +29,9 @@ import { TemporalService } from '../temporal/temporal.service';
 })
 @ApiTags('Health')
 export class HealthController {
+  @Inject(TypeOrmHealthIndicator)
+  private readonly db: TypeOrmHealthIndicator;
+
   @Inject(HealthCheckService)
   private readonly health: HealthCheckService;
 
@@ -37,6 +44,12 @@ export class HealthController {
     // Allow 1 second before timeout
     const timeout = 1000;
 
-    return this.health.check([() => this.temporal.healthcheck(timeout)]);
+    return this.health.check([
+      () =>
+        this.db.pingCheck('database', {
+          timeout,
+        }),
+      () => this.temporal.healthcheck(timeout),
+    ]);
   }
 }

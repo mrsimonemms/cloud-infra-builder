@@ -13,9 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import db from './db';
-import logger from './logger';
-import server from './server';
-import temporal from './temporal';
+import { join } from 'node:path';
+import * as driver from 'pg';
+import { DataSource } from 'typeorm';
 
-export default [db, logger, server, temporal];
+export const AppDataSource = new DataSource({
+  driver,
+  type: 'postgres',
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT ?? '5432', 10),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  synchronize: false,
+  logging: false,
+  entities: [join(__dirname, '**', '*.entity.{ts,js}')],
+  migrations: [join(__dirname, 'migrations', '*.{ts.js}')],
+  subscribers: [],
+});

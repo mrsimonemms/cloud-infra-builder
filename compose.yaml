@@ -7,6 +7,13 @@ services:
       args:
         APP: control-plane
     environment:
+      DB_HOST: db
+      DB_NAME: postgres
+      DB_PASSWORD: password
+      DB_RETRY_DELAY: 100
+      DB_RETRY_ATTEMPTS: 600
+      DB_SYNC: ${DB_SYNC-false}
+      DB_USERNAME: postgres
       TEMPORAL_ADDRESS: temporal:7233
       TEMPORAL_CONNECTION_TIMEOUT: 60s
     ports:
