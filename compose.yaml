@@ -23,6 +23,7 @@ services:
       - ./apps:/home/node/root/apps
     links:
       - db
+      - redis
       - temporal
     depends_on:
       - gobblr
@@ -53,6 +54,10 @@ services:
       - ./dev/data:/app/data
     restart: on-failure
     command: db sql pgsql --run
+
+  redis:
+    image: redis:7-alpine
+    restart: on-failure
 
   ############
   # Temporal #

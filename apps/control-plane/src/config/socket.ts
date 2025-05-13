@@ -13,10 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import db from './db';
-import logger from './logger';
-import server from './server';
-import socket from './socket';
-import temporal from './temporal';
+import { registerAs } from '@nestjs/config';
+import { RedisClientOptions } from 'redis';
 
-export default [db, logger, server, socket, temporal];
+export interface ISocketConfig {
+  redis: {
+    enabled: boolean;
+    opts: RedisClientOptions;
+  };
+}
+
+export default registerAs('socket', (): ISocketConfig => {
+  const enabled = process.env.SOCKET_REDIS_ENABLED === 'true';
+  const url = process.env.SOCKET_REDIS_URL;
+
+  if (enabled && !url) {
+    throw new Error('SOCKET_REDIS_URL envvar not set');
+  }
+
+  return {
+    redis: {
+      enabled,
+      opts: {
+        url,
+      },
+    },
+  };
+});

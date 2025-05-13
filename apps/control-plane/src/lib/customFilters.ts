@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import db from './db';
-import logger from './logger';
-import server from './server';
-import socket from './socket';
-import temporal from './temporal';
+import { Catch, ExceptionFilter } from '@nestjs/common';
+import { BaseWsExceptionFilter, WsException } from '@nestjs/websockets';
 
-export default [db, logger, server, socket, temporal];
+@Catch(WsException)
+export class WsExceptionFilter
+  extends BaseWsExceptionFilter
+  implements ExceptionFilter {}
