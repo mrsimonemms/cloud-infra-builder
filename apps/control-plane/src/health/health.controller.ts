@@ -21,6 +21,7 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 
+import { MessagingService } from '../messaging/messaging.service';
 import { TemporalService } from '../temporal/temporal.service';
 
 @Controller({
@@ -34,6 +35,9 @@ export class HealthController {
 
   @Inject(HealthCheckService)
   private readonly health: HealthCheckService;
+
+  @Inject(MessagingService)
+  private readonly messaging: MessagingService;
 
   @Inject(TemporalService)
   private readonly temporal: TemporalService;
@@ -49,6 +53,7 @@ export class HealthController {
         this.db.pingCheck('database', {
           timeout,
         }),
+      () => this.messaging.healthcheck(),
       () => this.temporal.healthcheck(timeout),
     ]);
   }

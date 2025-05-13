@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Module } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
+import { ConnectionOptions } from '@nats-io/nats-core';
+import { connect } from '@nats-io/transport-node';
+import { Provider } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-import { MessagingModule } from '../messaging/messaging.module';
-import { TemporalModule } from '../temporal/temporal.module';
-import { HealthController } from './health.controller';
+export const CONNECTION = Symbol('CONNECTION');
 
-@Module({
-  imports: [MessagingModule, TerminusModule, TemporalModule],
-  controllers: [HealthController],
-})
-export class HealthModule {}
+export const messagingProviders: Provider[] = [
+  {
+    inject: [ConfigService],
+    provide: CONNECTION,
+    useFactory: (cfg: ConfigService) =>
+      connect(cfg.getOrThrow<ConnectionOptions>('nats')),
+  },
+];

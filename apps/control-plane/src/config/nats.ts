@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Module } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
+import { ConnectionOptions } from '@nats-io/nats-core';
+import { registerAs } from '@nestjs/config';
 
-import { MessagingModule } from '../messaging/messaging.module';
-import { TemporalModule } from '../temporal/temporal.module';
-import { HealthController } from './health.controller';
-
-@Module({
-  imports: [MessagingModule, TerminusModule, TemporalModule],
-  controllers: [HealthController],
-})
-export class HealthModule {}
+export default registerAs(
+  'nats',
+  (): ConnectionOptions => ({
+    servers: (process.env.NATS_URL ?? '').split(',').filter((i) => i),
+    reconnect: process.env.NATS_RECONNECT !== 'false',
+  }),
+);

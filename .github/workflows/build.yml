@@ -322,14 +322,19 @@ jobs:
       DB_NAME: postgres
       DB_PASSWORD: password
       DB_USERNAME: postgres
+      NATS_URL: nats://127.0.0.1:4222
       TEMPORAL_ADDRESS: 127.0.0.1:7233
     services:
-      mysql:
+      db:
         image: postgres:17-alpine
         env:
           POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
+      nats:
+        image: nats
+        ports:
+          - 4222:4222
     steps:
       - uses: actions/checkout@v4
 

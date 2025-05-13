@@ -22,6 +22,7 @@ import config from './config';
 import { HealthModule } from './health/health.module';
 import { MetricsController } from './health/metrics.controller';
 import { DatabaseLogger } from './lib/databaseLogger';
+import { MessagingModule } from './messaging/messaging.module';
 import { TemporalModule } from './temporal/temporal.module';
 
 @Module({
@@ -48,7 +49,7 @@ import { TemporalModule } from './temporal/temporal.module';
     }),
 
     HealthModule,
-
+    MessagingModule,
     TemporalModule,
   ],
   controllers: [],

@@ -15,8 +15,9 @@
  */
 import db from './db';
 import logger from './logger';
+import nats from './nats';
 import server from './server';
 import socket from './socket';
 import temporal from './temporal';
 
-export default [db, logger, server, socket, temporal];
+export default [db, logger, nats, server, socket, temporal];

@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 import { Module } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
 
-import { MessagingModule } from '../messaging/messaging.module';
-import { TemporalModule } from '../temporal/temporal.module';
-import { HealthController } from './health.controller';
+import { messagingProviders } from './messaging.providers';
+import { MessagingService } from './messaging.service';
 
 @Module({
-  imports: [MessagingModule, TerminusModule, TemporalModule],
-  controllers: [HealthController],
+  providers: [...messagingProviders, MessagingService],
+  exports: [...messagingProviders, MessagingService],
 })
-export class HealthModule {}
+export class MessagingModule {}
