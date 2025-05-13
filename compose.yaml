@@ -1,29 +1,80 @@
 services:
+  control-plane:
+    build:
+      context: .
+      dockerfile: ./apps/node.Dockerfile
+      target: dev
+      args:
+        APP: control-plane
+    environment: {}
+    ports:
+      - 9000:3000
+    restart: on-failure
+    volumes:
+      - ./apps:/home/node/root/apps
+    links:
+      - db
+      - temporal
+    depends_on:
+      - gobblr
+
   ########################
   # Third-party services #
   ########################
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - 4000:5432
+
   gobblr:
     image: ghcr.io/mrsimonemms/gobblr
     environment:
-      GOBBLR_DATABASE: app
-      GOBBLR_HOST: mysql
+      GOBBLR_DATABASE: postgres
+      GOBBLR_HOST: db
       GOBBLR_PASSWORD: password
-      GOBBLR_USERNAME: app
+      GOBBLR_USERNAME: postgres
     ports:
       - 4001:5670
     links:
-      - mysql
+      - db
     volumes:
       - ./dev/data:/app/data
     restart: on-failure
-    command: db sql mysql --run
+    command: db sql pgsql --run
 
-  mysql:
+  ############
+  # Temporal #
+  ############
+  temporal:
+    image: temporalio/auto-setup
+    environment:
+      DB: mysql8
+      DB_PORT: 3306
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
+      MYSQL_PWD: password
+      MYSQL_SEEDS: temporal-db
+      MYSQL_USER: root
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CLI_ADDRESS: temporal:7233
+    depends_on:
+      - temporal-db
+    volumes:
+      - ./dev/temporal:/etc/temporal/config/dynamicconfig
+
+  temporal-db:
     image: mysql:8
     environment:
-      MYSQL_DATABASE: app
-      MYSQL_RANDOM_ROOT_PASSWORD: "true"
-      MYSQL_PASSWORD: password
-      MYSQL_USER: app
+      MYSQL_ROOT_PASSWORD: password
     ports:
-      - 4000:3306
+      - 4101:3306
+
+  temporal-ui:
+    image: temporalio/ui
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    depends_on:
+      - temporal
+    ports:
+      - 4100:8080
