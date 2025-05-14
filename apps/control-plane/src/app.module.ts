@@ -18,6 +18,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
+import { ClusterModule } from './cluster/cluster.module';
 import config from './config';
 import { HealthModule } from './health/health.module';
 import { MetricsController } from './health/metrics.controller';
@@ -48,6 +49,7 @@ import { TemporalModule } from './temporal/temporal.module';
       controller: MetricsController,
     }),
 
+    ClusterModule,
     HealthModule,
     MessagingModule,
     TemporalModule,
