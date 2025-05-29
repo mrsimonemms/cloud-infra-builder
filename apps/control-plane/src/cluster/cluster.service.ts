@@ -30,7 +30,6 @@ export class ClusterService {
   @Inject(WORKFLOW_CLIENT)
   private readonly temporalClient: Client;
 
-  // @todo(sje): save cluster info to database
   async create(cluster: CreateClusterDTO): Promise<CreateClusterResult> {
     const workflow = await this.temporalClient.workflow.start(
       CreateClusterWorkflowType,
